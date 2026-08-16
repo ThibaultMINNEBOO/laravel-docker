@@ -1,0 +1,29 @@
+{
+	skip_install_trust
+
+	{$CADDY_GLOBAL_OPTIONS}
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+{$SERVER_NAME:localhost} {
+	log {
+		{$CADDY_SERVER_LOG_OPTIONS}
+	}
+
+	root /app/public
+	encode zstd br gzip
+
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	# Serve the static files, and send everything else to Laravel's front controller.
+	# To enable the worker mode of FrankenPHP, install Laravel Octane and set the
+	# FRANKENPHP_SITE_CONFIG environment variable, see docs/octane.md
+	php_server {
+		{$FRANKENPHP_SITE_CONFIG}
+	}
+}

@@ -1,0 +1,35 @@
+---
+# Production environment override
+services:
+  php:
+    image: ${IMAGES_PREFIX:-}app-php-prod
+    build:
+      context: .
+      target: frankenphp_prod
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY}
+
+  # Uncomment to process the queued jobs, see docs/queue-scheduler.md
+  #worker:
+  #  image: ${IMAGES_PREFIX:-}app-php-prod
+  #  restart: unless-stopped
+  #  depends_on:
+  #    database:
+  #      condition: service_healthy
+  #  environment:
+  #    APP_ENV: production
+  #    APP_DEBUG: "false"
+  #    APP_KEY: ${APP_KEY}
+  #    DB_CONNECTION: pgsql
+  #    DB_HOST: database
+  #    DB_PORT: 5432
+  #    DB_DATABASE: ${POSTGRES_DB:-app}
+  #    DB_USERNAME: ${POSTGRES_USER:-app}
+  #    DB_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+  #  # Skip the init logic of the entrypoint (migrations are run by the php service)
+  #  entrypoint: ["docker-php-entrypoint"]
+  #  command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600"]
+  #  healthcheck:
+  #    disable: true

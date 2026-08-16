@@ -1,0 +1,36 @@
+---
+# Development environment override
+services:
+  php:
+    image: ${IMAGES_PREFIX:-}app-php-dev
+    build:
+      context: .
+      target: frankenphp_dev
+    volumes:
+      - ./:/app
+      - ./frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro
+      - ./frankenphp/conf.d/20-app.dev.ini:/usr/local/etc/php/app.conf.d/20-app.dev.ini:ro
+      # If you develop on Mac or Windows you can remove the vendor/ and node_modules/
+      # directories from the bind-mount for better performance by enabling the next lines:
+      #- /app/vendor
+      #- /app/node_modules
+    environment:
+      # Browser hot reloading is provided by Vite, see docs/vite.md
+      # See https://xdebug.org/docs/all_settings#mode
+      XDEBUG_MODE: "${XDEBUG_MODE:-develop}"
+      APP_ENV: "${APP_ENV:-local}"
+      APP_DEBUG: "${APP_DEBUG:-true}"
+    ports:
+      # Vite dev server, run "docker compose exec php npm run dev", see docs/vite.md
+      - name: vite
+        target: 5173
+        published: ${VITE_PORT:-5173}
+        protocol: tcp
+    extra_hosts:
+      # Ensure that host.docker.internal is correctly defined on Linux
+      - host.docker.internal:host-gateway
+    tty: true
+
+  database:
+    ports:
+      - "5432"
